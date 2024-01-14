@@ -6,6 +6,8 @@ public class Servidor {
     private Socket socket = null;
     private ObjectInputStream ois = null;
 
+    private ObjectOutputStream oos = null;
+
     public static void main(String[] args){
         Servidor servidor = new Servidor();
         servidor.comunicar();
@@ -26,11 +28,25 @@ public class Servidor {
             //ALMACENA OBJETO PERSONA
             Persona persona = (Persona) ois.readObject();
             System.out.println("Almacenado objeto persona de tipo Persona");
-            System.out.println(persona.getNombre() + " de "+ persona.getEdad() + " anyos.");
+
+            //MODIFICA OBJETO PERSONA
+            persona.setViajado(true);
+            System.out.println(persona.getNombre() + " de " + persona.getEdad()
+                        + " anyos. Viajado=" + persona.getViajado());
+
+            //FLUJO DE SALIDA
+            oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.flush();
+
+            //ESCRIBO EL OBJETO MODIFICADO EN EL FLUJO DE SALIDA
+            oos.writeObject(persona);
+            System.out.println("Enviado objeto persona");
 
             //CIERRO STREAMS Y SOCKET
+            oos.close();
             ois.close();
             socket.close();
+
         } catch (SocketException so){
             System.out.println("SocketException error en comunicar():"+so);
         } catch (IOException e){
